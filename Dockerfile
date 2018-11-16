@@ -3,6 +3,7 @@ FROM alpine:3.8
 ENV FILE_ORIG_CONFIG_INI /app/config.ini
 ENV FILE_CONFIG_INI /app/src/config.ini
 ENV GUNICORN_WORKER_AMOUNT 4
+ENV GUNICORN_TIMEOUT 300
 ENV GUNICORN_RELOAD ""
 
 RUN apk add python3 && rm -rf /var/cache/apk/*

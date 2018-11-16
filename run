@@ -4,4 +4,4 @@ mkdir -p /app/src
 
 sed s/^finnish_dep_parser_url\ =\ .*/finnish_dep_parser_url\ =\ http:\\/\\/$IP_BACKEND_FIN_DEP_PARSER:$PORT_BACKEND_FIN_DEP_PARSER/g "$FILE_ORIG_CONFIG_INI" > "$FILE_CONFIG_INI"
 
-/usr/bin/gunicorn $GUNICORN_RELOAD -w $GUNICORN_WORKER_AMOUNT -b 0.0.0.0:5000 run:app
+/usr/bin/gunicorn $GUNICORN_RELOAD -w $GUNICORN_WORKER_AMOUNT -t $GUNICORN_TIMEOUT -b 0.0.0.0:5000 run:app
