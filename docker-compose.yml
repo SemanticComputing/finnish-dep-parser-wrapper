@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+    fin-dep-parser-wrapper:
+        build: .
+        volumes:
+          - ./src:/app
+        depends_on:
+          - fin-dep-parser
+        ports:
+          - 5000:5000
+        networks:
+          seco:
+            ipv4_address: "172.30.20.64"
+        env_file:
+          - docker.env
+    fin-dep-parser:
+        image: secoresearch/finnish-dep-parser
+        ports:
+          - "9876:9876"
+        networks:
+          seco:
+            ipv4_address: "172.30.20.56"
+networks:
+    seco:
+      driver: "bridge"
+      ipam:
+        driver: "default"
+        config:
+          - subnet: "172.30.20.0/22"
