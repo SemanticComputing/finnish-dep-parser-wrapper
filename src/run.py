@@ -51,12 +51,15 @@ def index():
         depParser = RunFinDepParser(input_data)
         depParser.run()
         code = depParser.parse()
+        results = depParser.get_json_string()
 
         if code == 1:
-            results = depParser.get_json_string()
             print('results',results)
-            return str(results)
+            data = {"status": 200, "data": str(results)}
+            return json.dumps(data, ensure_ascii=False)
             #return "Success"
         else:
-            return results.toprettyxml()
+            data = {"status": -1, "data": results.toprettyxml()}
+            return json.dumps(data, ensure_ascii=False)
     return "415 Unsupported Media Type ;)"
+
