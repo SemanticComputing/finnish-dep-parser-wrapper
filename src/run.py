@@ -51,7 +51,7 @@ def index():
         depParser = RunFinDepParser(input_data)
         depParser.run()
         code = depParser.parse()
-        results = depParser.get_json_string()
+        results = depParser.get_json()
 
         if code == 1:
             print('results',results)
