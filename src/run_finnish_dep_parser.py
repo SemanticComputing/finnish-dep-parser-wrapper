@@ -17,7 +17,7 @@ logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
 class RunFinDepParser:
-    def __init__(self, input_texts):
+    def __init__(self, input_texts, env):
         self.input_texts = list()
         if len(input_texts)>0:
             self.input_texts = input_texts
@@ -33,14 +33,17 @@ class RunFinDepParser:
         self.sentences_data = dict()
 
 
-        self.read_configs()
+        self.read_configs(env)
 
-    def read_configs(self):
+    def read_configs(self, env):
 
         config = configparser.ConfigParser()
         config.read('src/config.ini')
 
-        self.tool = config['DEFAULT']['finnish_dep_parser_url']
+        if env == "TEST":
+            self.tool = config['TEST']['finnish_dep_parser_url']
+        else:
+            self.tool = config['DEFAULT']['finnish_dep_parser_url']
 
     def run(self):
         from itertools import zip_longest
@@ -52,6 +55,7 @@ class RunFinDepParser:
 
 
         items = list(self.input_texts.items())
+        print('items before', items)
         if len(items) > 1:
             chunksize = 4
             chunks = [items[i:i + chunksize] for i in range(0, len(items), chunksize)]
@@ -59,16 +63,19 @@ class RunFinDepParser:
             files = pool.map(self.execute_finer_parallel, chunks)
             pool.close()
             pool.join()
+            print('output', files[0])
         else:
             files = self.execute_finer(items)
 
         if files != None:
-            for f in files:
-                self.output_files.extend(f)
+            for i, j in files[0].items():
+                if i in self.output_texts:
+                    print('This already in', i, j)
+                self.output_texts[i] = j
 
     def execute_finer_parallel(self, data):
 
-        tmp_output_files = list()
+        outputtexts = dict()
 
         for tpl in data:
             ind =tpl[0]
@@ -78,16 +85,17 @@ class RunFinDepParser:
                 output_file = str(self.folder)+"output/"+str(ind)+".txt"
                 #print("IN=",input_text)
                 #print("OUT=", output_file)
-                tmp_output_files.append(output_file)
+                #tmp_output_files.append(output_file)
                 my_file = Path(output_file)
-                if not(my_file.exists()):
+                #if not(my_file.exists()):
 
-                    output = self.summon_dep_parser(input_text)  # +str(output_file)
-                    self.output_texts[ind] = output
-                    #self.write_output(output, output_file)
-                else:
-                    logging.info("File %s exists, moving on", output_file);
-        return tmp_output_files
+                output = self.summon_dep_parser(input_text)  # +str(output_file)
+                outputtexts[ind] = output
+                print(ind, output)
+                #self.write_output(output, output_file)
+                #else:
+                #    logging.info("File %s exists, moving on", output_file);
+        return outputtexts
 
 
 
@@ -99,6 +107,7 @@ class RunFinDepParser:
                 self.output_files.append(output_file)
                 output = self.summon_dep_parser(input_text)
                 self.output_texts[ind] = output
+                print(ind, output)
                 #self.write_output(output, output_file)
 
     def summon_dep_parser(self, input_text):
@@ -151,13 +160,16 @@ class RunFinDepParser:
         self.input_texts = input
 
     def parse(self):
+        print("Start to parse")
         words = list()
         words_json = list()
         for ind in self.output_texts.keys():
             data = self.output_texts[ind]
             if not(data.startswith('<?xml version="1.0" encoding="utf-8"?>')):
+                # conllu parse
                 sentences = parse(data)
-                print("input",sentences)
+                print(ind, "input",sentences)
+                words_json = list()
                 # Parse sentences to words
                 for i in range(0, len(sentences)):
                     sentence = sentences[i]
@@ -174,9 +186,10 @@ class RunFinDepParser:
                         words_json.insert(j, w.json())
 
                     # save words to a sentence, render to json
-                    self.sentences_data[i] = words
+                    self.sentences_data[ind] = words
                     words = list()
-                    self.sentences_json[i] = words_json
+                    self.sentences_json[ind] = words_json
+                    print(ind, self.sentences_data[ind])
             else:
                 return 0
         return 1

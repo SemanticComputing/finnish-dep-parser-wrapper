@@ -24,19 +24,34 @@ def before_request():
         print("FORM",request.form)
 
 def parse_input(request):
+    print('----------------------PARSE DATA----------------------')
     input = None
+    env = None
     if request.method == 'GET':
         text = request.args.get('text')
         sentences = tokenization(text)
         input = {i: sentences[i] for i in range(0, len(sentences))}
+
+        opt_param = request.args.get("test")
+        print('OPT PARAM', opt_param)
+        if opt_param != None:
+            env = "TEST"
+        print('VALUE', env)
     else:
         if request.headers['Content-Type'] == 'text/plain':
             sentences = tokenization(str(request.data.decode('utf-8')))
             input = {i:sentences[i] for i in range(0, len(sentences))}
             print("data", input)
+
+            opt_param = request.args.get("test")
+            print('OPT PARAM', opt_param)
+            if opt_param != None:
+                env = "TEST"
+            print('VALUE', env)
         else:
             print("Bad type", request.headers['Content-Type'])
-    return input
+    print('---------------------------------------------------')
+    return input, env
 
 def tokenization(text):
     print('Tokenize this', text)
@@ -46,9 +61,9 @@ def tokenization(text):
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    input_data = parse_input(request)
+    input_data, env = parse_input(request)
     if input_data != None:
-        depParser = RunFinDepParser(input_data)
+        depParser = RunFinDepParser(input_data, env)
         depParser.run()
         code = depParser.parse()
         results = depParser.get_json()
