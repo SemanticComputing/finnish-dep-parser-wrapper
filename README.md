@@ -45,7 +45,7 @@ Example output:
 
 For each sentence, the api returns set of identified named entities. The sentences are index from 0 to n.
 
-### Running in Docker
+## Running in Docker
 
 `docker-compose up`: builds and runs Finnish-Dep-Parser-Wrapper and Finnish-dep-parser webservice (see [repository](https://github.com/SemanticComputing/finnish-dep-parser-docker))
 
