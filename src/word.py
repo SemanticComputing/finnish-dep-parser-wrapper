@@ -57,7 +57,7 @@ class Word:
         return letter.isupper()
 
     def json(self):
-        data = {"FORM":self.word, "LEMMA":self.lemma, "UPOS":self.upos, "XPOS":self.uposx, "FEATS":self.feat.json(), "HEAD":self.head, "DEPREL":self.deprel, "DEPS":self.deps, "MISC":self.misc}
+        data = {"ID":self.id,"FORM":self.word, "LEMMA":self.lemma, "UPOS":self.upos, "XPOS":self.uposx, "EDGE":self.edge, "FEATS":self.feat.json(), "HEAD":self.head, "DEPREL":self.deprel, "DEPS":self.deps, "MISC":self.misc}
         return data
 
     def __repr__(self):
