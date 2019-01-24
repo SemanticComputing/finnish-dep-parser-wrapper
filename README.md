@@ -48,3 +48,7 @@ For each sentence, the api returns set of identified named entities. The sentenc
 ### Running in Docker
 
 `docker-compose up`: builds and runs Finnish-Dep-Parser-Wrapper and Finnish-dep-parser webservice (see [repository](https://github.com/SemanticComputing/finnish-dep-parser-docker))
+
+## Deployment in Rahti
+
+Updates are automatically deployed into `http://nlp.ldf.fi` when commits are pushed to this repo.
