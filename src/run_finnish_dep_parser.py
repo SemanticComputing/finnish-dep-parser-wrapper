@@ -49,14 +49,13 @@ class RunFinDepParser:
         from itertools import zip_longest
         from multiprocessing import Process
         import multiprocessing
-        pool = multiprocessing.Pool(4)
 
         files = None
-
 
         items = list(self.input_texts.items())
         print('items before', items)
         if len(items) > 1:
+            pool = multiprocessing.Pool(4)
             chunksize = 4
             chunks = [items[i:i + chunksize] for i in range(0, len(items), chunksize)]
 
