@@ -176,7 +176,7 @@ class RunFinDepParser:
                     for j in range(0, len(sentence)):
                         token = sentence[j]
                         #print("TOKEN",token, i)
-                        #print("TOKEN keys", token.keys())
+                        print("TOKEN keys", token.keys())
                         print("TOKEN word",token["form"])
                         #return 1
                         w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], token["edge"], token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
