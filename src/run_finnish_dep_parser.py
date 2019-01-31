@@ -179,7 +179,7 @@ class RunFinDepParser:
                         #print("TOKEN keys", token.keys())
                         print("TOKEN word",token["form"])
                         #return 1
-                        w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], "EDGE", token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
+                        w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], token["edge"], token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
                         w.set_feat(token["feats"])
                         words.insert(j, w)
                         words_json.insert(j, w.json())
