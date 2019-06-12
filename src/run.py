@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask import request
 import argparse
 import sys, os
@@ -10,6 +10,7 @@ import datetime
 import nltk
 import nltk.data
 import xml.dom.minidom
+from datetime import datetime as dt
 
 app = Flask(__name__)
 
@@ -70,11 +71,13 @@ def index():
 
         if code == 1:
             print('results',results)
-            data = {"status": 200, "data": str(results)}
-            return json.dumps(data, ensure_ascii=False)
+            data = {'status': 200, 'data': str(results), , 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+            return jsonify(json.dumps(data, ensure_ascii=False))
             #return "Success"
         else:
-            data = {"status": -1, "data": results.toprettyxml()}
-            return json.dumps(data, ensure_ascii=False)
-    return "415 Unsupported Media Type ;)"
+            data = {'status': -1, 'error': results.toprettyxml(), , 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+            return jsonify(json.dumps(data, ensure_ascii=False))
+    
+    data = {'status': -1, 'error': "415 Unsupported Media Type ;)", , 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+    return jsonify(json.dumps(data, ensure_ascii=False))
 
