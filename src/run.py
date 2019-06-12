@@ -71,13 +71,13 @@ def index():
 
         if code == 1:
             print('results',results)
-            data = {'status': 200, 'data': str(results), 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
-            return jsonify(json.dumps(data, ensure_ascii=False))
+            data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+            return jsonify(data)
             #return "Success"
         else:
             data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
             return jsonify(json.dumps(data, ensure_ascii=False))
     
     data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
-    return jsonify(json.dumps(data, ensure_ascii=False))
+    return jsonify(data)
 
