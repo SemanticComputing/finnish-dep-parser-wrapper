@@ -149,7 +149,7 @@ class MorphologicalFeatures:
             return False
 
     def json(self):
-        data = {"Case":self.case, "Number":self.number, "Tense":self.tense, "Mood":self.mood,"VerbForm":self.verbform, "Degree":self.degree, "PartForm":self.partform, "Derivation":self.derivation, "PronType":self.prontype, "AdpType":self.adptype, "NumType":self.numtype}
+        data = {"Case":self.case, "Number":self.number, "Tense":self.tense, "Mood":self.mood,"VerbForm":self.verbform, "Degree":self.degree, "PartForm":self.partform, "Derivation":self.derivation, "PronType":self.prontype, "AdpType":self.adptype, "NumType":self.numtype, "Voice":self.voice}
         return data
 
     def __str__(self):
