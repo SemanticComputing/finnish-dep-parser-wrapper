@@ -31,6 +31,8 @@ class RunFinDepParser:
         self.output_texts =dict()
         self.sentences_json = dict()
         self.sentences_data = dict()
+        self.tool = ""
+        self.chunks = 4
 
 
         self.read_configs(env)
@@ -42,8 +44,10 @@ class RunFinDepParser:
 
         if env == "TEST":
             self.tool = config['TEST']['finnish_dep_parser_url']
+            self.chunks = config['TEST']['chunking']
         else:
             self.tool = config['DEFAULT']['finnish_dep_parser_url']
+            self.chunks = config['DEFAULT']['chunking']
 
     def run(self):
         from itertools import zip_longest
@@ -56,15 +60,15 @@ class RunFinDepParser:
         print('items before', items)
         if len(items) > 1:
             pool = multiprocessing.Pool(4)
-            chunksize = 4
+            chunksize = self.chunks
             chunks = [items[i:i + chunksize] for i in range(0, len(items), chunksize)]
 
-            files = pool.map(self.execute_finer_parallel, chunks)
+            files = pool.map(self.execute_depparser_parallel, chunks)
             pool.close()
             pool.join()
             print('output', files[0])
         else:
-            files = self.execute_finer(items)
+            files = self.execute_depparser(items)
 
         if files != None:
             for i, j in files[0].items():
@@ -72,7 +76,7 @@ class RunFinDepParser:
                     print('This already in', i, j)
                 self.output_texts[i] = j
 
-    def execute_finer_parallel(self, data):
+    def execute_depparser_parallel(self, data):
 
         outputtexts = dict()
 
@@ -98,7 +102,7 @@ class RunFinDepParser:
 
 
 
-    def execute_finer(self, input):
+    def execute_depparser(self, input):
         for ind in self.input_texts.keys():
             input_text = self.input_texts[ind]
             if len(input_text.split())> 1:

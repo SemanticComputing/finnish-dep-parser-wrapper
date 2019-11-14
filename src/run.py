@@ -11,6 +11,7 @@ import nltk
 import nltk.data
 import xml.dom.minidom
 from datetime import datetime as dt
+import csv
 
 app = Flask(__name__)
 
@@ -56,9 +57,17 @@ def parse_input(request):
 
 def tokenization(text):
     print('Tokenize this', text)
-    tokenizer = nltk.data.load('tokenizers/punkt/finnish.pickle')
+    tokenizer = setup_tokenizer()
     return tokenizer.tokenize(text)
 
+def setup_tokenizer():
+    tokenizer = nltk.data.load('tokenizers/punkt/finnish.pickle')
+    with open('language-resources/abbreviations.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=';')
+        for row in csv_reader:
+            print("Add abbreviation", row[0])
+            tokenizer._params.abbrev_types.add(row[0])
+    return tokenizer
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
