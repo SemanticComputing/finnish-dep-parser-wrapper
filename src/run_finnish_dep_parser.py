@@ -44,10 +44,10 @@ class RunFinDepParser:
 
         if env == "TEST":
             self.tool = config['TEST']['finnish_dep_parser_url']
-            self.chunks = config['TEST']['chunking']
+            self.chunks = int(config['TEST']['chunking'])
         else:
             self.tool = config['DEFAULT']['finnish_dep_parser_url']
-            self.chunks = config['DEFAULT']['chunking']
+            self.chunks = int(config['DEFAULT']['chunking'])
 
     def run(self):
         from itertools import zip_longest
