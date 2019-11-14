@@ -6,7 +6,7 @@ ENV GUNICORN_WORKER_AMOUNT 4
 ENV GUNICORN_TIMEOUT 300
 ENV GUNICORN_RELOAD ""
 
-RUN apk add python3 && rm -rf /var/cache/apk/*
+RUN apk add python3 libc-dev && rm -rf /var/cache/apk/*
 
 RUN pip3 install flask requests nltk conllu gunicorn
 
