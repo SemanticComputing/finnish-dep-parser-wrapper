@@ -31,7 +31,7 @@ def parse_input(request):
     env = None
     if request.method == 'GET':
         text = request.args.get('text')
-        sentences = tokenization(text)
+        sentences = text.splitlines()#tokenization(text)
         input = {i: sentences[i] for i in range(0, len(sentences))}
 
         opt_param = request.args.get("test")
@@ -41,7 +41,7 @@ def parse_input(request):
         print('VALUE', env)
     else:
         if request.headers['Content-Type'] == 'text/plain':
-            sentences = tokenization(str(request.data.decode('utf-8')))
+            sentences = str(request.data.decode('utf-8')).splitlines() #tokenization(str(request.data.decode('utf-8')))
             input = {i:sentences[i] for i in range(0, len(sentences))}
             print("data", input)
 

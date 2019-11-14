@@ -8,6 +8,9 @@ from pathlib import Path
 import configparser
 from conllu import parse
 from word import Word
+from itertools import zip_longest
+from multiprocessing import Process
+import multiprocessing
 
 logger = logging.getLogger('Finer')
 hdlr = logging.FileHandler('finer.log')
@@ -50,13 +53,10 @@ class RunFinDepParser:
             self.chunks = int(config['DEFAULT']['chunking'])
 
     def run(self):
-        from itertools import zip_longest
-        from multiprocessing import Process
-        import multiprocessing
-
         files = None
 
         items = list(self.input_texts.items())
+        print('url', self.tool)
         print('items before', items)
         if len(items) > 1:
             pool = multiprocessing.Pool(4)
@@ -66,7 +66,6 @@ class RunFinDepParser:
             files = pool.map(self.execute_depparser_parallel, chunks)
             pool.close()
             pool.join()
-            print('output', files[0])
         else:
             files = self.execute_depparser(items)
 
@@ -110,18 +109,18 @@ class RunFinDepParser:
                 self.output_files.append(output_file)
                 output = self.summon_dep_parser(input_text)
                 self.output_texts[ind] = output
-                print(ind, output)
+                #print(ind, output)
                 #self.write_output(output, output_file)
 
     def summon_dep_parser(self, input_text):
         output = ""
         command = self.contruct_command(input_text)
         if self.tool.startswith('http'):
-            print(self.tool)
+            #print(self.tool)
             payload = {'text': str(input_text)}
             r = requests.get(self.tool, params=payload)
 
-            print(r.text)
+            #print(r.text)
             output = str(r.text)
         else:
             try:
