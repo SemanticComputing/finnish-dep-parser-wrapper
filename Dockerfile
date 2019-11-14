@@ -16,6 +16,8 @@ WORKDIR /app
 
 COPY src ./
 
+COPY language-resources ./language-resources/
+
 RUN chgrp -R 0 /app \
     && chmod -R g+rwX /app
 
