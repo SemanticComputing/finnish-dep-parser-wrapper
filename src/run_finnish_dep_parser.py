@@ -118,12 +118,12 @@ class RunFinDepParser:
         if self.tool.startswith('http'):
 
             payload = {'text': str(input_text)}
-            #r = requests.get(self.tool, params=payload)
-            print("No query made, just mocking", payload, self.tool)
+            r = requests.get(self.tool, params=payload)
+            #print("No query made, just mocking", payload, self.tool)
 
 
-            #output = str(r.text)
-            output = ""
+            output = str(r.text)
+            #output = ""
         else:
             try:
                 logging.info(command)
