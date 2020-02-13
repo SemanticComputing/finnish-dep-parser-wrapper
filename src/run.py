@@ -69,7 +69,7 @@ def setup_tokenizer():
             tokenizer._params.abbrev_types.add(row[0])
     return tokenizer
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['POST', 'GET', 'OPTIONS'])
 def index():
     input_data, env = parse_input(request)
     if input_data != None:

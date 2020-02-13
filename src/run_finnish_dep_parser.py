@@ -59,7 +59,7 @@ class RunFinDepParser:
         print('url', self.tool)
         print('items before', items)
         if len(items) > 1:
-            pool = multiprocessing.Pool(4)
+            pool = multiprocessing.Pool(self.chunks)
             chunksize = self.chunks
             chunks = [items[i:i + chunksize] for i in range(0, len(items), chunksize)]
 
@@ -93,7 +93,7 @@ class RunFinDepParser:
 
                 output = self.summon_dep_parser(input_text)  # +str(output_file)
                 outputtexts[ind] = output
-                print(ind, output)
+                #print(ind, output)
                 #self.write_output(output, output_file)
                 #else:
                 #    logging.info("File %s exists, moving on", output_file);
