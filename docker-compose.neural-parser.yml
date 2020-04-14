@@ -2,8 +2,6 @@ version: "3.7"
 services:
     fin-dep-parser-wrapper:
         build: .
-        volumes:
-          - ./src:/app
         depends_on:
           - turku-neural-parser
         ports:
