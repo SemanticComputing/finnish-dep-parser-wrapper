@@ -6,10 +6,9 @@ Annotates given text and outputs JSON.
 
 ## Getting Started
 
-To execute, set environment variable
-```
-export FLASK_APP=src/run.py
-```
+To execute, set environment variables:
+* ``` export FLASK_APP=src/run.py ```
+* ``` export FDP_CONFIG_ENV='DEFAULT' ```
 
 Then run ``` flask run ```
 
@@ -34,6 +33,12 @@ curl -d 'Helsingin kirjamessut perui Kiuas-kirjakustantamon osallistumisen messu
 ### Configurations
 
 The configurations for Finnish-dep-parser can be found in the ```conf/config.ini```.
+
+* finnish_dep_parser_url (test: http://nlp.ldf.fi/fin-dep-parser-ws): service url for Finnish Dependency Parser 
+* chunking: number of chunks to which texts are divided for parallel analysis, i.e., how many texts can be processed in parallel.
+
+In order to use these configurations, set the environment variable FDP_CONFIG_ENV to 'DEFAULT' or to you personal setting. The value is the section name in the config.ini file where the personal settings can be set for the attributes (configurations) defined above. 
+
 
 ### Output
 

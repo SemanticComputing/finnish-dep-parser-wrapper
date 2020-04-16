@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from flask import request
+from flask import request, abort
 import argparse
 import sys, os
 from run_finnish_dep_parser import RunFinDepParser
@@ -28,30 +28,32 @@ def before_request():
 def parse_input(request):
     print('----------------------PARSE DATA----------------------')
     input = None
-    env = None
+    env = 'DEFAULT'
     if request.method == 'GET':
         text = request.args.get('text')
         input = {0:text}
-
-        opt_param = request.args.get("test")
-        print('OPT PARAM', opt_param)
-        if opt_param != None:
-            env = "TEST"
-        print('VALUE', env)
     else:
         if request.headers['Content-Type'] == 'text/plain':
             text = str(request.data.decode('utf-8'))
             input = {0: text}
-            print("data", input)
-
-            opt_param = request.args.get("test")
-            print('OPT PARAM', opt_param)
-            if opt_param != None:
-                env = "TEST"
-            print('VALUE', env)
         else:
             print("Bad type", request.headers['Content-Type'])
     print('---------------------------------------------------')
+
+    # read environment from environment variable
+    try:
+        env = os.environ['FDP_CONFIG_ENV']
+    except KeyError as kerr:
+        print("Environment variable FDP_CONFIG_ENV not set:", sys.exc_info()[0])
+        traceback.print_exc()
+        env = None
+        abort(500, 'Problem with setup: internal server error')
+    except Exception as err:
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc()
+        env = None
+        abort(500, 'Unexpected Internal Server Error')
+
     return input, env
 
 def tokenization(text):

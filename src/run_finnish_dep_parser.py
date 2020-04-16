@@ -11,6 +11,7 @@ from word import Word
 from itertools import zip_longest
 from multiprocessing import Process
 import multiprocessing
+from flask import abort
 
 logger = logging.getLogger('depparser_wrapper')
 hdlr = logging.FileHandler('depparser_wrapper.log')
@@ -42,15 +43,31 @@ class RunFinDepParser:
 
     def read_configs(self, env):
 
-        config = configparser.ConfigParser()
-        config.read('conf/config.ini')
+        try:
+            config = configparser.ConfigParser()
+            config.read('conf/config.ini')
 
-        if env == "TEST":
-            self.tool = config['TEST']['finnish_dep_parser_url']
-            self.chunks = int(config['TEST']['chunking'])
-        else:
-            self.tool = config['DEFAULT']['finnish_dep_parser_url']
-            self.chunks = int(config['DEFAULT']['chunking'])
+            if env in config:
+                self.tool = config[env]['finnish_dep_parser_url']
+                self.chunks = int(config[env]['chunking'])
+            elif env == None or len(env) == 0:
+                err_msg = 'The environment is not set: %s' % (env)
+                raise Exception(err_msg)
+            else:
+                if 'DEFAULT' in config:
+                    self.tool = config['DEFAULT']['finnish_dep_parser_url']
+                    self.chunks = int(config['DEFAULT']['chunking'])
+                else:
+                    err_msg = 'Cannot find section headers: %s, %s' % (env, 'DEFAULT')
+                    raise MissingSectionHeaderError(err_msg)
+        except Error as e:
+            print("[ERROR] ConfigParser error:", sys.exc_info()[0])
+            traceback.print_exc()
+            abort(500)
+        except Exception as err:
+            print("[ERROR] Unexpected error:", sys.exc_info()[0])
+            traceback.print_exc()
+            abort(500)
 
     def run(self):
         files = None
