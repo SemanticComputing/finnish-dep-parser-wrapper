@@ -1,7 +1,5 @@
 FROM alpine:3.8
 
-ENV FILE_ORIG_CONFIG_INI /app/config.ini
-ENV FILE_CONFIG_INI /app/conf/config.ini
 ENV GUNICORN_WORKER_AMOUNT 4
 ENV GUNICORN_TIMEOUT 300
 ENV GUNICORN_RELOAD ""
@@ -15,6 +13,9 @@ RUN python3 -c "import nltk; nltk.download('punkt', '/usr/share/nltk_data')"
 WORKDIR /app
 
 COPY src ./
+
+ENV CONF_FILE=/app/conf/config.ini 
+COPY conf/config.ini $CONF_FILE
 
 COPY language-resources ./language-resources/
 
