@@ -12,8 +12,8 @@ from itertools import zip_longest
 from multiprocessing import Process
 import multiprocessing
 
-logger = logging.getLogger('Finer')
-hdlr = logging.FileHandler('finer.log')
+logger = logging.getLogger('depparser_wrapper')
+hdlr = logging.FileHandler('depparser_wrapper.log')
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
@@ -43,7 +43,7 @@ class RunFinDepParser:
     def read_configs(self, env):
 
         config = configparser.ConfigParser()
-        config.read('src/config.ini')
+        config.read('conf/config.ini')
 
         if env == "TEST":
             self.tool = config['TEST']['finnish_dep_parser_url']
@@ -85,18 +85,12 @@ class RunFinDepParser:
 
             if len(input_text.split())> 1:
                 output_file = str(self.folder)+"output/"+str(ind)+".txt"
-                #print("IN=",input_text)
-                #print("OUT=", output_file)
-                #tmp_output_files.append(output_file)
+
                 my_file = Path(output_file)
-                #if not(my_file.exists()):
 
                 output = self.summon_dep_parser(input_text)  # +str(output_file)
                 outputtexts[ind] = output
-                #print(ind, output)
-                #self.write_output(output, output_file)
-                #else:
-                #    logging.info("File %s exists, moving on", output_file);
+
         return outputtexts
 
 
@@ -109,8 +103,6 @@ class RunFinDepParser:
                 self.output_files.append(output_file)
                 output = self.summon_dep_parser(input_text)
                 self.output_texts[ind] = output
-                #print(ind, output)
-                #self.write_output(output, output_file)
 
     def summon_dep_parser(self, input_text):
         output = ""
@@ -119,11 +111,7 @@ class RunFinDepParser:
 
             payload = {'text': str(input_text)}
             r = requests.get(self.tool, params=payload)
-            #print("No query made, just mocking", payload, self.tool)
-
-
             output = str(r.text)
-            #output = ""
         else:
             try:
                 logging.info(command)
@@ -169,6 +157,7 @@ class RunFinDepParser:
         words_json = list()
         for ind in self.output_texts.keys():
             data = self.output_texts[ind]
+            print("Parse this:", data)
             if not(data.startswith('<?xml version="1.0" encoding="utf-8"?>')):
                 # conllu parse
                 sentences = parse(data)
@@ -180,10 +169,8 @@ class RunFinDepParser:
                     # Parse words to word-objects
                     for j in range(0, len(sentence)):
                         token = sentence[j]
-                        #print("TOKEN",token, i)
-                        print("TOKEN keys", token.keys())
-                        print("TOKEN word",token["form"])
-                        #return 1
+                        #print("TOKEN keys", token.keys())
+                        #print("TOKEN word",token["form"])
                         w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], "Edge", token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
                         w.set_feat(token["feats"])
                         words.insert(j, w)

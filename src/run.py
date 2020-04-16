@@ -31,8 +31,7 @@ def parse_input(request):
     env = None
     if request.method == 'GET':
         text = request.args.get('text')
-        sentences = text.splitlines()#tokenization(text)
-        input = {i: sentences[i] for i in range(0, len(sentences))}
+        input = {0:text}
 
         opt_param = request.args.get("test")
         print('OPT PARAM', opt_param)
@@ -41,8 +40,8 @@ def parse_input(request):
         print('VALUE', env)
     else:
         if request.headers['Content-Type'] == 'text/plain':
-            sentences = str(request.data.decode('utf-8')).splitlines() #tokenization(str(request.data.decode('utf-8')))
-            input = {i:sentences[i] for i in range(0, len(sentences))}
+            text = str(request.data.decode('utf-8'))
+            input = {0: text}
             print("data", input)
 
             opt_param = request.args.get("test")
@@ -82,7 +81,6 @@ def index():
             print('results',results)
             data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
             return jsonify(data)
-            #return "Success"
         else:
             data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
             return jsonify(json.dumps(data, ensure_ascii=False))
