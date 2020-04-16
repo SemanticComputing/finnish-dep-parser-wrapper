@@ -3,21 +3,22 @@ services:
     fin-dep-parser-wrapper:
         build: .
         depends_on:
-          - fin-dep-parser
+          - turku-neural-parser
         ports:
           - 5000:5000
         networks:
           seco:
-            ipv4_address: "172.30.20.64"
+            ipv4_address: "172.30.20.98"
         env_file:
-          - docker.env
-    fin-dep-parser:
-        image: secoresearch/finnish-dep-parser
+          - docker.neural-parser.env
+    turku-neural-parser:
+        image: hsci/turku-neural-parser-openshift
+        command: server fi_tdt parse_plaintext
         ports:
-          - "9876:9876"
+          - "7689:7689"
         networks:
           seco:
-            ipv4_address: "172.30.20.56"
+            ipv4_address: "172.30.20.97"
 networks:
     seco:
       driver: "bridge"
