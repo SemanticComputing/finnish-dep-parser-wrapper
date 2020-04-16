@@ -6,6 +6,7 @@ import logging, requests
 import os.path
 from pathlib import Path
 import configparser
+from configparser import Error, ParsingError, MissingSectionHeaderError, NoOptionError, DuplicateOptionError, DuplicateSectionError, NoSectionError
 from conllu import parse
 from word import Word
 from itertools import zip_longest
