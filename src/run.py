@@ -11,7 +11,7 @@ import nltk
 import nltk.data
 import xml.dom.minidom
 from datetime import datetime as dt
-import csv
+import csv, traceback
 
 app = Flask(__name__)
 
