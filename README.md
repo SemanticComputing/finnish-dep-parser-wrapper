@@ -34,10 +34,10 @@ curl -d 'Helsingin kirjamessut perui Kiuas-kirjakustantamon osallistumisen messu
 
 The configurations for Finnish-dep-parser can be found in the ```conf/config.ini```.
 
-* finnish_dep_parser_url (test: http://nlp.ldf.fi/fin-dep-parser-ws): service url for Finnish Dependency Parser 
+* finnish_dep_parser_url (test: http://nlp.ldf.fi/fin-dep-parser-ws): service url for Finnish Dependency Parser
 * chunking: number of chunks to which texts are divided for parallel analysis, i.e., how many texts can be processed in parallel.
 
-In order to use these configurations, set the environment variable FDP_CONFIG_ENV to 'DEFAULT' or to you personal setting. The value is the section name in the config.ini file where the personal settings can be set for the attributes (configurations) defined above. 
+In order to use these configurations, set the environment variable FDP_CONFIG_ENV to 'DEFAULT' or to you personal setting. The value is the section name in the config.ini file where the personal settings can be set for the attributes (configurations) defined above.
 
 
 ### Output
@@ -53,6 +53,13 @@ For each sentence, the api returns set of identified named entities. The sentenc
 ## Running in Docker
 
 `docker-compose up`: builds and runs Finnish-Dep-Parser-Wrapper and Finnish-dep-parser webservice (see [repository](https://github.com/SemanticComputing/finnish-dep-parser-docker))
+
+The following configuration parameters can be passed as environment variables to the Finnish-Dep-Parser-Wrapper container:
+
+* IP_BACKEND_FIN_DEP_PARSER
+* PORT_BACKEND_FIN_DEP_PARSER
+
+Other configuration parameters should be set by using a config.ini (see section Configurations above) which can be e.g. bind mounted to container's path `/app/conf/config.ini`.
 
 ## Deployment in Rahti
 
