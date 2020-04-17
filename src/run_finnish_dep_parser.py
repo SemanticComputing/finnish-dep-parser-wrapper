@@ -37,7 +37,8 @@ class RunFinDepParser:
         self.sentences_json = dict()
         self.sentences_data = dict()
         self.tool = ""
-        self.chunks = 4
+        self.pool_number = 4
+        self.pool_size = 4
 
 
         self.read_configs(env)
@@ -50,14 +51,16 @@ class RunFinDepParser:
 
             if env in config:
                 self.tool = config[env]['finnish_dep_parser_url']
-                self.chunks = int(config[env]['chunking'])
+                self.pool_number = int(config[env]['pool_number'])
+                self.pool_size = int(config[env]['chunking'])
             elif env == None or len(env) == 0:
                 err_msg = 'The environment is not set: %s' % (env)
                 raise Exception(err_msg)
             else:
                 if 'DEFAULT' in config:
                     self.tool = config['DEFAULT']['finnish_dep_parser_url']
-                    self.chunks = int(config['DEFAULT']['chunking'])
+                    self.pool_size = int(config['DEFAULT']['chunking'])
+                    self.pool_number = int(config[env]['pool_number'])
                 else:
                     err_msg = 'Cannot find section headers: %s, %s' % (env, 'DEFAULT')
                     raise MissingSectionHeaderError(err_msg)
@@ -77,8 +80,8 @@ class RunFinDepParser:
         print('url', self.tool)
         print('items before', items)
         if len(items) > 1:
-            pool = multiprocessing.Pool(self.chunks)
-            chunksize = self.chunks
+            pool = multiprocessing.Pool(self.pool_number)
+            chunksize = self.pool_size
             chunks = [items[i:i + chunksize] for i in range(0, len(items), chunksize)]
 
             files = pool.map(self.execute_depparser_parallel, chunks)

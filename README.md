@@ -36,9 +36,9 @@ The configurations for Finnish-dep-parser can be found in the ```conf/config.ini
 
 * finnish_dep_parser_url (test: http://nlp.ldf.fi/fin-dep-parser-ws): service url for Finnish Dependency Parser
 * chunking: number of chunks to which texts are divided for parallel analysis, i.e., how many texts can be processed in parallel.
+* pool_number: (default: 4) number of worker processes used to process the texts. This impacts how many cores are used by the application.
 
 In order to use these configurations, set the environment variable FDP_CONFIG_ENV to 'DEFAULT' or to you personal setting. The value is the section name in the config.ini file where the personal settings can be set for the attributes (configurations) defined above.
-
 
 ### Output
 
