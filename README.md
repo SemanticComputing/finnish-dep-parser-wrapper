@@ -54,7 +54,7 @@ For each sentence, the api returns set of identified named entities. The sentenc
 
 `docker-compose up`: builds and runs Finnish-Dep-Parser-Wrapper and Finnish-dep-parser webservice (see [repository](https://github.com/SemanticComputing/finnish-dep-parser-docker))
 
-The following configuration parameters can be passed as environment variables to the Finnish-Dep-Parser-Wrapper container:
+The following configuration parameters must be passed as environment variables to the Finnish-Dep-Parser-Wrapper container:
 
 * IP_BACKEND_FIN_DEP_PARSER
 * PORT_BACKEND_FIN_DEP_PARSER
