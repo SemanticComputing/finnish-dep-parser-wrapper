@@ -7,7 +7,7 @@ import os.path
 from pathlib import Path
 import configparser
 from configparser import Error, ParsingError, MissingSectionHeaderError, NoOptionError, DuplicateOptionError, DuplicateSectionError, NoSectionError
-from conllu import parse
+from conllu import parse, parse_tree
 from word import Word
 from itertools import zip_longest
 from multiprocessing import Process
@@ -36,6 +36,7 @@ class RunFinDepParser:
         self.output_texts =dict()
         self.sentences_json = dict()
         self.sentences_data = dict()
+        self.paragraph_data = dict()
         self.tool = ""
         self.pool_number = 4
         self.pool_size = 4
@@ -177,37 +178,64 @@ class RunFinDepParser:
         words = list()
         words_json = list()
         for ind in self.output_texts.keys():
-            data = self.output_texts[ind]
-            print("Parse this:", data)
-            if not(data.startswith('<?xml version="1.0" encoding="utf-8"?>')):
-                # conllu parse
-                sentences = parse(data)
-                print(ind, "input",sentences)
-                words_json = list()
-                # Parse sentences to words
-                for i in range(0, len(sentences)):
-                    sentence = sentences[i]
-                    # Parse words to word-objects
-                    for j in range(0, len(sentence)):
-                        token = sentence[j]
-                        #print("TOKEN keys", token.keys())
-                        #print("TOKEN word",token["form"])
-                        w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], "Edge", token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
-                        w.set_feat(token["feats"])
-                        words.insert(j, w)
-                        words_json.insert(j, w.json())
+            if not (self.output_texts[ind].startswith('<?xml version="1.0" encoding="utf-8"?>')):
+                datalist = [d for d in self.output_texts[ind].replace('# newdoc','').split('# newpar') if len(d.strip())>0]
+                for h in range(0, len(datalist)):
+                    self.paragraph_data[h] = dict()
+                    data = datalist[h]
+                    print("Parse this:", data)
+                    # conllu parse
+                    sentences = parse(data)#parse(data)
+                    print(ind, "input",sentences, len(sentences))
+                    if len(sentences) > 0:
+                        # Parse sentences to words
+                        for i in range(0, len(sentences)):
+                            words_json = list()
+                            sentence = sentences[i]
+                            print("check metadata:",sentence.metadata)
+                            text = self.extract_text_from_metadata(sentence.metadata)
+                            # Parse words to word-objects
+                            for j in range(0, len(sentence)):
+                                token = sentence[j]
+                                #print("TOKEN keys", token.keys())
+                                #print("TOKEN word",token["form"])
+                                w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], "Edge", token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
+                                w.set_feat(token["feats"])
+                                words.insert(j, w)
+                                words_json.insert(j, w.json())
 
-                    # save words to a sentence, render to json
-                    self.sentences_data[ind] = words
-                    words = list()
-                    self.sentences_json[ind] = words_json
-                    print(ind, self.sentences_data[ind])
+                            # save words to a sentence, render to json
+                            self.sentences_data[i] = words
+                            words = list()
+                            self.sentences_json[i] = words_json
+                            print(i, self.sentences_data[i])
+                            print("text:", text)
+
+                            if len(text) == 0 or text == None:
+                                print("Build text")
+                                text=self.build_text(self.sentences_data[i])
+
+                            if i not in self.paragraph_data[h]:
+                                self.paragraph_data[h][i]={'words':words_json, 'text':text}
             else:
                 return 0
         return 1
 
+    def extract_text_from_metadata(self, metadata):
+        if metadata != None:
+            if 'text' in metadata:
+                return metadata['text']
+        return ""
+
+    def build_text(self, words):
+        text = ""
+        for w in words:
+            print(w)
+            text += w.get_word() + " "
+        return text
+
     def get_json(self):
-        return self.sentences_json
+        return self.paragraph_data
 
     def get_json_string(self):
         return json.dumps(self.sentences_json, ensure_ascii=False)
