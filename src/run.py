@@ -1,32 +1,39 @@
-from flask import Flask, jsonify
-from flask import request, abort
 import argparse
-import sys, os
-from run_finnish_dep_parser import RunFinDepParser
-import logging, json
-import re
-import time
+import csv
 import datetime
-import nltk
-import nltk.data
+import json
+import logging
+import logging.config
+import os
+import re
+import sys
+import time
+import traceback
 import xml.dom.minidom
 from datetime import datetime as dt
-import csv, traceback
+
+import nltk
+import nltk.data
+from flask import Flask, abort, jsonify, request
+
+from run_finnish_dep_parser import RunFinDepParser
+
+logging.config.fileConfig(fname='conf/logging.ini', disable_existing_loggers=False)
+logger = logging.getLogger('run')
 
 app = Flask(__name__)
-
 
 @app.before_request
 def before_request():
     if True:
-        print("HEADERS", request.headers)
-        print("REQ_path", request.path)
-        print("ARGS",request.args)
-        print("DATA",request.data)
-        print("FORM",request.form)
+        logger.info("HEADERS: %s", request.headers)
+        logger.info("REQ_path: %s", request.path)
+        logger.info("ARGS: %s",request.args)
+        logger.info("DATA: %s",request.data)
+        logger.info("FORM: %s",request.form)
 
 def parse_input(request):
-    print('----------------------PARSE DATA----------------------')
+    logger.debug('----------------------PARSE DATA----------------------')
     input = None
     env = 'DEFAULT'
     if request.method == 'GET':
@@ -37,27 +44,29 @@ def parse_input(request):
             text = str(request.data.decode('utf-8'))
             input = {0: text}
         else:
-            print("Bad type", request.headers['Content-Type'])
-    print('---------------------------------------------------')
+            logger.warning("Bad type", request.headers['Content-Type'])
+    logger.debug('---------------------------------------------------')
 
     # read environment from environment variable
     try:
         env = os.environ['FDP_CONFIG_ENV']
     except KeyError as kerr:
-        print("Environment variable FDP_CONFIG_ENV not set:", sys.exc_info()[0])
-        traceback.print_exc()
+        logger.error(kerr)
+        logger.error("Environment variable FDP_CONFIG_ENV not set: %s", sys.exc_info()[0])
+        logger.error(traceback.print_exc())
         env = None
         abort(500, 'Problem with setup: internal server error')
     except Exception as err:
-        print("Unexpected error:", sys.exc_info()[0])
-        traceback.print_exc()
+        logger.error(err)
+        logger.error("Unexpected error: %s", sys.exc_info()[0])
+        logger.error(traceback.print_exc())
         env = None
         abort(500, 'Unexpected Internal Server Error')
 
     return input, env
 
 def tokenization(text):
-    print('Tokenize this', text)
+    logger.debug('Tokenize this: %s', text)
     tokenizer = setup_tokenizer()
     return tokenizer.tokenize(text)
 
@@ -66,7 +75,7 @@ def setup_tokenizer():
     with open('language-resources/abbreviations.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=';')
         for row in csv_reader:
-            print("Add abbreviation", row[0])
+            logger.debug("Add abbreviation: %s", row[0])
             tokenizer._params.abbrev_types.add(row[0])
     return tokenizer
 
@@ -80,7 +89,7 @@ def index():
         results = depParser.get_json()
 
         if code == 1:
-            #print('results',results)
+            logger.debug('results: %s',results)
             data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
             return jsonify(data)
         else:
@@ -89,4 +98,3 @@ def index():
     
     data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
     return jsonify(data)
-

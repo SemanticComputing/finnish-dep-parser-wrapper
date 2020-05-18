@@ -16,6 +16,7 @@ Then run ``` flask run ```
 
 Uses Python 3.5 or newer
 Python libraries: flask, requests, nltk, conllu
+For more information, check [requirements.txt](requirements.txt)
 
 ## Usage
 
@@ -39,6 +40,10 @@ The configurations for Finnish-dep-parser can be found in the ```conf/config.ini
 * pool_number: (default: 4) number of worker processes used to process the texts. This impacts how many cores are used by the application.
 
 In order to use these configurations, set the environment variable FDP_CONFIG_ENV to 'DEFAULT' or to you personal setting. The value is the section name in the config.ini file where the personal settings can be set for the attributes (configurations) defined above.
+
+### Logging configuration
+
+The configurations for logging are in the [conf/logging.ini](conf/logging.ini) file. In production, the configurations should be set to WARNING mode in all log files to limit the amount of logging to only errors. The INFO and DEBUG logging modes serve better the debugging in the development environment.
 
 ### Output
 

@@ -1,3 +1,8 @@
+import logging, logging.config
+
+logging.config.fileConfig(fname='conf/logging.ini', disable_existing_loggers=False)
+logger = logging.getLogger('doc')
+
 class MorphologicalFeatures:
     def __init__(self):
         self.case = ""
@@ -65,8 +70,8 @@ class MorphologicalFeatures:
     def parse(self, feats):
         if feats == None:
             return
-        print('features',feats)
-        #print('features', feats.keys())
+        logger.info('features: %s',feats)
+        logger.debug('features keys: %s', feats.keys())
         if "Case" in feats:
             self.case = feats['Case']
         if "Number" in feats:

@@ -1,12 +1,11 @@
-from morphologicalfeatures import MorphologicalFeatures
 import logging
+import logging.config
 
-logger = logging.getLogger('DocumentStructure')
-hdlr = logging.FileHandler('documentstructure.log')
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr)
-logger.setLevel(logging.INFO)
+from morphologicalfeatures import MorphologicalFeatures
+
+logging.config.fileConfig(fname='conf/logging.ini', disable_existing_loggers=False)
+logger = logging.getLogger('doc')
+
 class Word:
     def __init__(self, word, upos, uposx, feat, edge, id, lemma, head, deprel, deps, misc):
         self.lemma = lemma
@@ -21,10 +20,7 @@ class Word:
         self.deprel = deprel
         self.deps = deps
         self.misc = misc
-
-    def get_uri(self):
-        return self.uri
-
+        
     def get_word(self):
         return self.word
 
@@ -71,9 +67,6 @@ class Word:
         return hash((self.word))
 
     def __eq__(self, other):
-        if self.uri != other.get_uri():
-            return False
-
         if self.word != other.get_word():
             return False
 

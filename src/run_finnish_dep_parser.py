@@ -1,25 +1,29 @@
-import subprocess
-import fnmatch
-import os, json
-import ntpath
-import logging, requests
-import os.path
-from pathlib import Path
 import configparser
-from configparser import Error, ParsingError, MissingSectionHeaderError, NoOptionError, DuplicateOptionError, DuplicateSectionError, NoSectionError
-from conllu import parse, parse_tree
-from word import Word
+import fnmatch
+import json
+import logging
+import logging.config
+import multiprocessing
+import ntpath
+import os
+import os.path
+import subprocess
+from configparser import (DuplicateOptionError, DuplicateSectionError, Error,
+                          MissingSectionHeaderError, NoOptionError,
+                          NoSectionError, ParsingError)
 from itertools import zip_longest
 from multiprocessing import Process
-import multiprocessing
+from pathlib import Path
+import traceback, sys
+
+import requests
 from flask import abort
 
-logger = logging.getLogger('depparser_wrapper')
-hdlr = logging.FileHandler('depparser_wrapper.log')
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr)
-logger.setLevel(logging.INFO)
+from conllu import parse, parse_tree
+from word import Word
+
+logging.config.fileConfig(fname='conf/logging.ini', disable_existing_loggers=False)
+logger = logging.getLogger('depparser')
 
 class RunFinDepParser:
     def __init__(self, input_texts, env):
@@ -40,7 +44,6 @@ class RunFinDepParser:
         self.tool = ""
         self.pool_number = 4
         self.pool_size = 4
-
 
         self.read_configs(env)
 
@@ -66,20 +69,22 @@ class RunFinDepParser:
                     err_msg = 'Cannot find section headers: %s, %s' % (env, 'DEFAULT')
                     raise MissingSectionHeaderError(err_msg)
         except Error as e:
-            print("[ERROR] ConfigParser error:", sys.exc_info()[0])
-            traceback.print_exc()
+            logger.error(e)
+            logger.error("[ERROR] ConfigParser error: %s", sys.exc_info()[0])
+            logger.error(traceback.print_exc())
             abort(500)
         except Exception as err:
-            print("[ERROR] Unexpected error:", sys.exc_info()[0])
-            traceback.print_exc()
+            logger.error(err)
+            logger.error("[ERROR] Unexpected error: %s", sys.exc_info()[0])
+            logger.error(traceback.print_exc())
             abort(500)
 
     def run(self):
         files = None
 
         items = list(self.input_texts.items())
-        print('url', self.tool)
-        print('items before', items)
+        logger.info('url: %s', self.tool)
+        logger.info('items before: %s', items)
         if len(items) > 1:
             pool = multiprocessing.Pool(self.pool_number)
             chunksize = self.pool_size
@@ -94,7 +99,7 @@ class RunFinDepParser:
         if files != None:
             for i, j in files[0].items():
                 if i in self.output_texts:
-                    print('This already in', i, j)
+                    logger.info('This already in: %s, %s', i, j)
                 self.output_texts[i] = j
 
     def execute_depparser_parallel(self, data):
@@ -115,8 +120,6 @@ class RunFinDepParser:
 
         return outputtexts
 
-
-
     def execute_depparser(self, input):
         for ind in self.input_texts.keys():
             input_text = self.input_texts[ind]
@@ -129,21 +132,21 @@ class RunFinDepParser:
     def summon_dep_parser(self, input_text):
         output = ""
         command = self.contruct_command(input_text)
-        if self.tool.startswith('http'):
+        if self.tool.startswith('http') or  self.tool.startswith('https'):
 
             payload = {'text': str(input_text)}
             r = requests.get(self.tool, params=payload)
             output = str(r.text)
         else:
             try:
-                logging.info(command)
+                logger.info(command)
                 output = subprocess.check_output(command, shell=True, executable='/bin/bash').decode("utf-8")
             except subprocess.CalledProcessError as cpe:
-                logging.warning("Error: %s", cpe.output)
+                logger.warning("Error: %s", cpe.output)
         return output
 
     def contruct_command(self, input_text):
-        if self.tool.startswith('http'):
+        if self.tool.startswith('http') or self.tool.startswith('https'):
             pass
         else:
             return self.tool+str(" <<< '")+str(input_text.replace("'","").replace("\\","")) +str("'")
@@ -174,7 +177,7 @@ class RunFinDepParser:
         self.input_texts = input
 
     def parse(self):
-        print("Start to parse")
+        logger.info("Start to parse")
         words = list()
         words_json = list()
         for ind in self.output_texts.keys():
@@ -183,22 +186,22 @@ class RunFinDepParser:
                 for h in range(0, len(datalist)):
                     self.paragraph_data[h] = dict()
                     data = datalist[h]
-                    print("Parse this:", data)
+                    logger.info("Parse this: %s", data)
                     # conllu parse
                     sentences = parse(data)#parse(data)
-                    print(ind, "input",sentences, len(sentences))
+                    logger.debug("%s, %s, %s, %s",ind, "input",sentences, len(sentences))
                     if len(sentences) > 0:
                         # Parse sentences to words
                         for i in range(0, len(sentences)):
                             words_json = list()
                             sentence = sentences[i]
-                            print("check metadata:",sentence.metadata)
+                            logger.info("check metadata: %s",sentence.metadata)
                             text = self.extract_text_from_metadata(sentence.metadata)
                             # Parse words to word-objects
                             for j in range(0, len(sentence)):
                                 token = sentence[j]
-                                #print("TOKEN keys", token.keys())
-                                #print("TOKEN word",token["form"])
+                                logger.debug("TOKEN keys: %s", token.keys())
+                                logger.debug("TOKEN word: %s",token["form"])
                                 w = Word(token["form"], token["upostag"], token["xpostag"], token["feats"], "Edge", token["id"], token["lemma"], token["head"], token["deprel"], token["deps"], token["misc"])
                                 w.set_feat(token["feats"])
                                 words.insert(j, w)
@@ -208,11 +211,11 @@ class RunFinDepParser:
                             self.sentences_data[i] = words
                             words = list()
                             self.sentences_json[i] = words_json
-                            print(i, self.sentences_data[i])
-                            print("text:", text)
+                            logger.debug("%s, %s", i, self.sentences_data[i])
+                            logger.debug("text: %s", text)
 
                             if len(text) == 0 or text == None:
-                                print("Build text")
+                                logger.debug("Build text")
                                 text=self.build_text(self.sentences_data[i])
 
                             if i not in self.paragraph_data[h]:
@@ -239,6 +242,3 @@ class RunFinDepParser:
 
     def get_json_string(self):
         return json.dumps(self.sentences_json, ensure_ascii=False)
-
-
-
