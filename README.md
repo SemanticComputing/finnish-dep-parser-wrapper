@@ -66,6 +66,10 @@ The following configuration parameters must be passed as environment variables t
 
 Other configuration parameters should be set by using a config.ini (see section Configurations above) which can be e.g. bind mounted to container's path `/app/conf/config.ini`.
 
+The log level can be specified by passing the following environment variable to the container:
+
+* LOG_LEVEL
+
 ## Deployment in Rahti
 
 Updates are automatically deployed into `http://nlp.ldf.fi` when commits are pushed to this repo.
