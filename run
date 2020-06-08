@@ -6,4 +6,4 @@ fi
 
 sed -i s/^finnish_dep_parser_url\ =\ .*/finnish_dep_parser_url\ =\ http:\\/\\/$IP_BACKEND_FIN_DEP_PARSER:$PORT_BACKEND_FIN_DEP_PARSER/g "$CONF_FILE"
 
-/usr/bin/gunicorn $GUNICORN_RELOAD -w $GUNICORN_WORKER_AMOUNT -t $GUNICORN_TIMEOUT -b 0.0.0.0:5000 run:app
+$GUNICORN_BIN $GUNICORN_RELOAD -w $GUNICORN_WORKER_AMOUNT -t $GUNICORN_TIMEOUT -b 0.0.0.0:5000 run:app

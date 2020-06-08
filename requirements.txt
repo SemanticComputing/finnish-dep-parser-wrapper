@@ -1,0 +1,4 @@
+conllu
+flask
+nltk
+requests
