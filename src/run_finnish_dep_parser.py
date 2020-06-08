@@ -123,7 +123,7 @@ class RunFinDepParser:
     def execute_depparser(self, input):
         for ind in self.input_texts.keys():
             input_text = self.input_texts[ind]
-            if len(input_text.split())> 1:
+            if len(input_text.split())> 0:
                 output_file = str(self.folder)+"output/"+str(ind)+".txt"
                 self.output_files.append(output_file)
                 output = self.summon_dep_parser(input_text)
