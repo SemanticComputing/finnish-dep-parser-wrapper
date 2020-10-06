@@ -110,7 +110,7 @@ class RunFinDepParser:
             ind =tpl[0]
             input_text = tpl[1]
 
-            if len(input_text.split())> 1:
+            if len(input_text.split())> 0:
                 output_file = str(self.folder)+"output/"+str(ind)+".txt"
 
                 my_file = Path(output_file)
