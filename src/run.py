@@ -11,6 +11,7 @@ import time
 import traceback
 import xml.dom.minidom
 from datetime import datetime as dt
+import cgi
 
 import nltk
 import nltk.data
@@ -36,15 +37,16 @@ def parse_input(request):
     logger.debug('----------------------PARSE DATA----------------------')
     input = None
     env = 'DEFAULT'
+    mimetype, options = cgi.parse_header(request.headers['Content-Type'])
     if request.method == 'GET':
         text = request.args.get('text')
         input = {0:text}
     else:
-        if request.headers['Content-Type'] == 'text/plain':
+        if mimetype == 'text/plain':
             text = str(request.data.decode('utf-8'))
             input = {0: text}
         else:
-            logger.warning("Bad type", request.headers['Content-Type'])
+            logger.warning("Bad type", mimetype)
     logger.debug('---------------------------------------------------')
 
     # read environment from environment variable
