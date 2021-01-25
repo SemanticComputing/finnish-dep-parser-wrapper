@@ -37,36 +37,38 @@ def parse_input(request):
     logger.debug('----------------------PARSE DATA----------------------')
     input = None
     env = 'DEFAULT'
-    if 'Content-Type' in request.headers:
-        mimetype, options = cgi.parse_header(request.headers['Content-Type'])
-        if request.method == 'GET':
-            text = request.args.get('text')
-            input = {0:text}
-        else:
+
+    if request.method == 'GET':
+        text = request.args.get('text')
+        input = {0:text}
+    else:
+        try:
+            mimetype, options = cgi.parse_header(request.headers['Content-Type'])
             if mimetype == 'text/plain':
                 text = str(request.data.decode('utf-8'))
                 input = {0: text}
             else:
                 logger.warning("Bad type", mimetype)
-        logger.debug('---------------------------------------------------')
+        except Exception as errr:
+            logger.error(errr)
+            logger.error("Unable to process request, cannot retrieve content-type from the header %s" % (request.headers))
+    logger.debug('---------------------------------------------------')
 
-        # read environment from environment variable
-        try:
-            env = os.environ['FDP_CONFIG_ENV']
-        except KeyError as kerr:
-            logger.error(kerr)
-            logger.error("Environment variable FDP_CONFIG_ENV not set: %s", sys.exc_info()[0])
-            logger.error(traceback.print_exc())
-            env = None
-            abort(500, 'Problem with setup: internal server error')
-        except Exception as err:
-            logger.error(err)
-            logger.error("Unexpected error: %s", sys.exc_info()[0])
-            logger.error(traceback.print_exc())
-            env = None
-            abort(500, 'Unexpected Internal Server Error')
-    else:
-        logger.error("Unable to process request, cannot retrieve content-type from the header %s" % (request.headers))
+    # read environment from environment variable
+    try:
+        env = os.environ['FDP_CONFIG_ENV']
+    except KeyError as kerr:
+        logger.error(kerr)
+        logger.error("Environment variable FDP_CONFIG_ENV not set: %s", sys.exc_info()[0])
+        logger.error(traceback.print_exc())
+        env = None
+        abort(500, 'Problem with setup: internal server error')
+    except Exception as err:
+        logger.error(err)
+        logger.error("Unexpected error: %s", sys.exc_info()[0])
+        logger.error(traceback.print_exc())
+        env = None
+        abort(500, 'Unexpected Internal Server Error')
 
     return input, env
 
