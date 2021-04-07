@@ -1,6 +1,7 @@
 .idea
 .idea/*
 venv/*
+fdp/*
 fdp-wrapper/*
 *.log
 src/__pycache__/*
