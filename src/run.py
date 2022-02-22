@@ -49,6 +49,7 @@ def parse_input(request):
                 input = {0: text}
             else:
                 logger.warning("Bad type", mimetype)
+
         except Exception as errr:
             logger.error(errr)
             logger.error("Unable to process request, cannot retrieve content-type from the header %s" % (request.headers))
@@ -97,11 +98,11 @@ def index():
 
         if code == 1:
             logger.debug('results: %s',results)
-            data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+            data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
             return jsonify(data)
         else:
-            data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+            data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
             return jsonify(json.dumps(data, ensure_ascii=False))
     
-    data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'date':dt.today().strftime('%Y-%m-%d')}
+    data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
     return jsonify(data)

@@ -238,7 +238,13 @@ class RunFinDepParser:
         return text
 
     def get_json(self):
-        return self.paragraph_data
+        output = list()
+        for k,v in self.paragraph_data.items():
+            for s, data in v.items():
+                data["paragraph"] = k
+                data["sentence"] = s
+                output.append(data)
+        return output
 
     def get_json_string(self):
         return json.dumps(self.sentences_json, ensure_ascii=False)
