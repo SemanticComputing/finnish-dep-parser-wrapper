@@ -98,11 +98,11 @@ def index():
 
         if code == 1:
             logger.debug('results: %s',results)
-            data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
+            data = {'status': 200, 'data': results, 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S'), 'version':"version 1.1-beta"}
             return jsonify(data)
         else:
-            data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
+            data = {'status': -1, 'error': results.toprettyxml(), 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S'), 'version':"version 1.1-beta"}
             return jsonify(json.dumps(data, ensure_ascii=False))
     
-    data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S')}
+    data = {'status': -1, 'error': "415 Unsupported Media Type ;)", 'service':"Finnish-dep-parser wrapper", 'timestamp':dt.today().strftime('%Y-%m-%d %H:%M:%S'), 'version':"version 1.1-beta"}
     return jsonify(data)
