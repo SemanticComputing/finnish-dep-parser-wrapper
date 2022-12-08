@@ -1,8 +1,12 @@
 # Finnish-Dep-Parser-Wrapper
 
-Wrapping up Finnish-dep-parser.
+## About
 
-Annotates given text and outputs JSON.
+A wrapper for Finnish dependency parser or Turku neural parser that tarnsforms results from CoNLL-u format to JSON format. The wrapper also creates an API interface to pass on the text input to the tools.
+
+### API
+
+The service has also a usable API for testing. The service API description can be found from [Swagger](https://app.swaggerhub.com/apis-docs/SeCo/nlp.ldf.fi/1.0.0#/Finnish-dep-parser/).
 
 ## Getting Started
 
